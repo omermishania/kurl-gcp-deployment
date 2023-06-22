@@ -23,12 +23,17 @@ resource "google_compute_instance_template" "template" {
   region       = "us-central1"
   disk {
       source_image = "centos-cloud/centos-stream-8"
-      disk_size_gb = 30
+      disk_size_gb = 32
+  }
+  disk {
+      disk_size_gb = 15
+      # ADD UNFORMATTED BLOCK DEVICE FOR ROOK
   }
   network_interface {
     subnetwork = "omer-subnet"
         access_config {}
   }
+  depends_on = [google_compute_network.network, google_compute_subnetwork.subnet]
 }
 
 resource "google_compute_instance_group_manager" "group" {
