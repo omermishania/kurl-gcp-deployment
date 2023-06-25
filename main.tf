@@ -33,6 +33,9 @@ resource "google_compute_instance_template" "template" {
     subnetwork = "omer-subnet"
         access_config {}
   }
+  metadata_startup_script = <<-EOF
+  curl -sSL https://kurl.sh/b58a0f8 | sudo bash
+  EOF
   depends_on = [google_compute_network.network, google_compute_subnetwork.subnet]
 }
 
