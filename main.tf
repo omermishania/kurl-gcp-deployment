@@ -16,8 +16,9 @@ resource "google_compute_subnetwork" "subnet" {
   region        = "us-central1"
 }
 
-resource "google_compute_instance_template" "template" {
-  name = "omer-instance-template"
+# Master node template
+resource "google_compute_instance_template" "master-template" {
+  name = "omer-instance-master-template"
   tags = ["owner", "omer"]
   machine_type = "custom-4-8192"
   region       = "us-central1"
@@ -39,12 +40,45 @@ resource "google_compute_instance_template" "template" {
   depends_on = [google_compute_network.network, google_compute_subnetwork.subnet]
 }
 
-resource "google_compute_instance_group_manager" "group" {
-  name        = "omer-instance-group"
-  base_instance_name = "omer-instance"
+# Master node group manager
+resource "google_compute_instance_group_manager" "master-group" {
+  name        = "omer-instance-master-group"
+  base_instance_name = "omer-master-instance"
   zone        = "us-central1-a"
   version {
-    instance_template = google_compute_instance_template.template.self_link
+    instance_template = google_compute_instance_template.master-template.self_link
+  }
+  target_size = 1
+}
+
+# Worker node template
+resource "google_compute_instance_template" "worker-template" {
+  name = "omer-instance-worker-template"
+  tags = ["owner", "omer"]
+  machine_type = "custom-4-8192"
+  region       = "us-central1"
+  disk {
+      source_image = "centos-cloud/centos-stream-8"
+      disk_size_gb = 64
+  }
+  disk {
+      disk_size_gb = 25
+      # ADD UNFORMATTED BLOCK DEVICE FOR ROOK
+  }
+  network_interface {
+    subnetwork = "omer-subnet"
+        access_config {}
+  }
+  depends_on = [google_compute_network.network, google_compute_subnetwork.subnet]
+}
+
+# Worker node group manager
+resource "google_compute_instance_group_manager" "worker-group" {
+  name        = "omer-instance-worker-group"
+  base_instance_name = "omer-worker-instance"
+  zone        = "us-central1-a"
+  version {
+    instance_template = google_compute_instance_template.worker-template.self_link
   }
   target_size = 1
 }
