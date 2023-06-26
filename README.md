@@ -1,2 +1,3 @@
 # kurl-with-gcp
-Create 4 GCP instances (will be used as cluster nodes) with Terraform, install K8S and add instances as nodes with kURL and add Ceph as object storage in that cluster
+Create 2 GCP instances (will be used as cluster nodes) with Terraform.
+Install K8S, add instances as nodes, and add Ceph as object storage in that cluster with kURL
