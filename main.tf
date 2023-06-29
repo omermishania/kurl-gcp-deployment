@@ -19,14 +19,14 @@ resource "google_compute_subnetwork" "subnet" {
 resource "google_compute_instance_template" "master-template" {
   name         = var.master_template_name
   tags         = ["owner", "omer"]
-  machine_type = "custom-4-8192"
+  machine_type = "custom-${var.instance_cpu_count}-${var.instance_memory_gb * 1024}"
   region       = var.region
   disk {
     source_image = "centos-cloud/centos-stream-8"
-    disk_size_gb = 32
+    disk_size_gb = var.master_root_disk_size
   }
   disk {
-    disk_size_gb = var.master_disk_size
+    disk_size_gb = var.master_unformatted_disk_size
   }
   network_interface {
     subnetwork = google_compute_subnetwork.subnet.self_link
@@ -45,20 +45,20 @@ resource "google_compute_instance_group_manager" "master-group" {
   version {
     instance_template = google_compute_instance_template.master-template.self_link
   }
-  target_size = 1
+  target_size = var.master_group_target_size
 }
 
 resource "google_compute_instance_template" "worker-template" {
   name         = var.worker_template_name
   tags         = ["owner", "omer"]
-  machine_type = "custom-4-8192"
+  machine_type = "custom-${var.instance_cpu_count}-${var.instance_memory_gb * 1024}"
   region       = var.region
   disk {
     source_image = "centos-cloud/centos-stream-8"
-    disk_size_gb = 64
+    disk_size_gb = var.worker_root_disk_size
   }
   disk {
-    disk_size_gb = var.worker_disk_size
+    disk_size_gb = var.worker_unformatted_disk_size
   }
   network_interface {
     subnetwork = google_compute_subnetwork.subnet.self_link
@@ -74,7 +74,7 @@ resource "google_compute_instance_group_manager" "worker-group" {
   version {
     instance_template = google_compute_instance_template.worker-template.self_link
   }
-  target_size = 1
+  target_size = var.worker_group_target_size
 }
 
 resource "google_compute_firewall" "all_traffic_egress" {

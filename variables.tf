@@ -34,6 +34,18 @@ variable "subnet_ip_range" {
   default     = "10.1.0.0/24"
 }
 
+variable "instance_cpu_count" {
+description = "Number of CPUs for GCP instances"
+type = number
+default = 8
+}
+
+variable "instance_memory_gb" {
+description = "Amount of memory in GB for GCP instances"
+type = number
+default = 16
+}
+
 variable "master_template_name" {
   description = "Name of the Google Compute instance template for master nodes"
   type        = string
@@ -58,16 +70,40 @@ variable "worker_group_name" {
   default     = "omer-instance-worker-group"
 }
 
-variable "master_disk_size" {
-  description = "Size of the disk for master nodes"
+variable "master_group_target_size" {
+  description = "Target size of the Google Compute instance group for master nodes"
   type        = number
-  default     = 15
+  default     = 1
 }
 
-variable "worker_disk_size" {
-  description = "Size of the disk for worker nodes"
+variable "worker_group_target_size" {
+  description = "Target size of the Google Compute instance group for worker nodes"
   type        = number
-  default     = 25
+  default     = 4
+}
+
+variable "master_root_disk_size" {
+  description = "Size of the root disk for master nodes"
+  type        = number
+  default     = 32
+}
+
+variable "worker_root_disk_size" {
+  description = "Size of the root disk for worker nodes"
+  type        = number
+  default     = 64
+}
+
+variable "master_unformatted_disk_size" {
+  description = "Size of the unformatted disk for rook (ceph) on master nodes"
+  type        = number
+  default     = 150
+}
+
+variable "worker_unformatted_disk_size" {
+  description = "Size of the unformatted disk for rook (ceph) on worker nodes"
+  type        = number
+  default     = 150
 }
 
 variable "firewall_egress_name" {
